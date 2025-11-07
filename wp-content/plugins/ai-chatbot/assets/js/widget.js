@@ -9,7 +9,6 @@
 
     // Chat widget state
     let isOpen = false;
-    let conversationHistory = [];
     let previousFocus = null;
 
     // DOM elements
@@ -25,7 +24,6 @@
      */
     function init() {
         createWidget();
-        loadHistory();
         attachEventListeners();
     }
 
@@ -224,9 +222,6 @@
 
             // Add bot response
             addMessage(data.answer, 'bot', data.sources);
-
-            // Save to history
-            saveHistory();
         })
         .catch(error => {
             console.error('Chat error:', error);
@@ -285,18 +280,6 @@
         // Scroll to bottom
         messagesContainer.scrollTop = messagesContainer.scrollHeight;
 
-        // Add to conversation history
-        conversationHistory.push({
-            content: content,
-            type: type,
-            sources: sources
-        });
-
-        // Keep only last 10 exchanges (20 messages)
-        if (conversationHistory.length > 20) {
-            conversationHistory = conversationHistory.slice(-20);
-        }
-
         return messageDiv;
     }
 
@@ -345,65 +328,6 @@
         return text.replace(/[&<>"']/g, m => map[m]);
     }
 
-    /**
-     * Load conversation history from localStorage
-     */
-    function loadHistory() {
-        try {
-            const stored = localStorage.getItem('ai_chatbot_history');
-            if (stored) {
-                conversationHistory = JSON.parse(stored);
-
-                // Restore messages to UI (skip initial greeting)
-                conversationHistory.forEach(msg => {
-                    const messageDiv = document.createElement('div');
-                    messageDiv.className = `ai-chatbot-message ai-chatbot-message-${msg.type}`;
-
-                    const contentDiv = document.createElement('div');
-                    contentDiv.className = 'ai-chatbot-message-content';
-                    contentDiv.textContent = msg.content;
-
-                    messageDiv.appendChild(contentDiv);
-
-                    if (msg.sources && msg.sources.length > 0) {
-                        const sourcesDiv = document.createElement('div');
-                        sourcesDiv.className = 'ai-chatbot-sources';
-                        sourcesDiv.innerHTML = '<strong>Sources:</strong>';
-
-                        const sourcesList = document.createElement('ul');
-                        msg.sources.forEach(source => {
-                            const li = document.createElement('li');
-                            const a = document.createElement('a');
-                            a.href = source.url;
-                            a.target = '_blank';
-                            a.rel = 'noopener noreferrer';
-                            a.textContent = source.title || source.url;
-                            li.appendChild(a);
-                            sourcesList.appendChild(li);
-                        });
-
-                        sourcesDiv.appendChild(sourcesList);
-                        messageDiv.appendChild(sourcesDiv);
-                    }
-
-                    messagesContainer.appendChild(messageDiv);
-                });
-            }
-        } catch (e) {
-            console.error('Failed to load history:', e);
-        }
-    }
-
-    /**
-     * Save conversation history to localStorage
-     */
-    function saveHistory() {
-        try {
-            localStorage.setItem('ai_chatbot_history', JSON.stringify(conversationHistory));
-        } catch (e) {
-            console.error('Failed to save history:', e);
-        }
-    }
 
     // Initialize when DOM is ready
     if (document.readyState === 'loading') {

@@ -54,8 +54,8 @@
             $.ajax({
                 url: aiChatbotAdmin.restUrl + '/ingest',
                 method: 'POST',
-                beforeSend: function(xhr) {
-                    xhr.setRequestHeader('X-WP-Nonce', aiChatbotAdmin.nonce);
+                headers: {
+                    'X-WP-Nonce': wpApiSettings.nonce
                 },
                 data: JSON.stringify({
                     reindex: true
@@ -98,8 +98,8 @@
             $.ajax({
                 url: aiChatbotAdmin.restUrl + '/ingest',
                 method: 'POST',
-                beforeSend: function(xhr) {
-                    xhr.setRequestHeader('X-WP-Nonce', aiChatbotAdmin.nonce);
+                headers: {
+                    'X-WP-Nonce': wpApiSettings.nonce
                 },
                 data: JSON.stringify({
                     url: url

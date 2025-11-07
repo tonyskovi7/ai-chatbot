@@ -140,15 +140,20 @@ class OpenAI_Client {
         $fallback = get_option('ai_chatbot_fallback_message', __('I don\'t have enough information to answer that question.', 'ai-chatbot'));
         $extra_instructions = get_option('ai_chatbot_extra_instructions', '');
 
-        $system_message = sprintf(
-            "You are a helpful assistant. Answer questions ONLY using the provided context below. If the context doesn't contain enough information to answer the question, respond with: \"%s\"\n\nBe concise and accurate. Always cite your sources when possible.",
+        $system_message = "You are a helpful assistant.";
+
+        // Add extra instructions first (highest priority)
+        if (!empty($extra_instructions)) {
+            $system_message .= "\n\nIMPORTANT - Follow these instructions carefully:\n" . trim($extra_instructions);
+        }
+
+        // Add main answering instructions
+        $system_message .= sprintf(
+            "\n\nAnswer questions ONLY using the provided context below. If the context doesn't contain enough information to answer the question, respond with: \"%s\"\n\nBe concise and accurate. Always cite your sources when possible.",
             $fallback
         );
 
-        if (!empty($extra_instructions)) {
-            $system_message .= "\n\nAdditional instructions:\n" . $extra_instructions;
-        }
-
+        // Add context last
         if (!empty($context)) {
             $system_message .= "\n\nContext:\n" . $context;
         }

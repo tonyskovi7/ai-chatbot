@@ -73,6 +73,14 @@ if (isset($_POST['ai_chatbot_save_settings']) && check_admin_referer('ai_chatbot
         $old_links = get_option('ai_chatbot_links', []);
         update_option('ai_chatbot_links', $new_links);
 
+        // Delete chunks for removed links
+        $removed_links = array_diff($old_links, $new_links);
+        if (!empty($removed_links)) {
+            foreach ($removed_links as $url) {
+                Database::delete_chunks_by_url($url);
+            }
+        }
+
         // Auto-reindex newly added links
         if (get_option('ai_chatbot_auto_reindex_on_add', true)) {
             $added_links = array_diff($new_links, $old_links);

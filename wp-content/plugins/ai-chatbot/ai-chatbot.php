@@ -189,7 +189,7 @@ class AI_Chatbot {
         wp_enqueue_script(
             'ai-chatbot-admin',
             AI_CHATBOT_PLUGIN_URL . 'assets/js/admin.js',
-            ['jquery'],
+            ['jquery', 'wp-api'],
             AI_CHATBOT_VERSION,
             true
         );
